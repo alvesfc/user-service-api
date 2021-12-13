@@ -1,0 +1,234 @@
+openapi: 3.0.3
+
+info:
+  title: User Service API
+  description: Application for Microservices study.
+  version: 1.0.0
+
+  contact:
+    name: Marcos Alves Cunha
+    url: https://marcosalves.dev
+    email: alvesfc@marcosalves.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/alvesfc/user-api/1.0.0
+
+security:
+  - basicAuth: []
+
+paths:
+  /users/v1/:
+    post:
+      tags:
+        - Users
+      summary: New User
+      description: Create a new User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: A User object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '415':
+          $ref: '#/components/responses/Unsupported_Media_Type'
+        '500':
+          $ref: '#/components/responses/Internal_Server_Error'
+
+    get:
+      tags:
+        - Users
+      summary: Get User info
+      description: Get **User** info by Email and Password.
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Found User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '415':
+          $ref: '#/components/responses/Unsupported_Media_Type'
+        '500':
+          $ref: '#/components/responses/Internal_Server_Error'
+
+    put:
+      tags:
+        - Users
+      summary: Update User
+      description: Update a **User** info by Email and Password.
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Update User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '415':
+          $ref: '#/components/responses/Unsupported_Media_Type'
+        '500':
+          $ref: '#/components/responses/Internal_Server_Error'
+
+    delete:
+      tags:
+        - Users
+      summary: Delete User by Code
+      description: Delete a **User** by Email and Password.
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Delete a User
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '415':
+          $ref: '#/components/responses/Unsupported_Media_Type'
+        '500':
+          $ref: '#/components/responses/Internal_Server_Error'
+
+
+components:
+
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: This API uses Basic Auth.
+
+
+  schemas:
+    User:
+      type: object
+      description: User Schema
+      properties:
+        code:
+          description: The users Code
+          type: string
+          format: uuid
+          readOnly: true
+        nickname:
+          description: The users Nickname
+          type: string
+          minLength: 3
+          maxLength: 60
+          example: nickname
+        full_name:
+          description: The users Full Name
+          type: string
+          minLength: 3
+          maxLength: 60
+          example: User Full Name
+        email:
+          description: Email Name
+          type: string
+          format: email
+          minLength: 3
+          maxLength: 60
+          example: user@example.com
+        password:
+          description: The users password
+          type: string
+          format: byte
+          minLength: 8
+          maxLength: 30
+          writeOnly: true
+          example: bXlQYXNzd29yZA==
+        active:
+          description: The users Active
+          type: boolean
+          readOnly: true
+        create_date:
+          description: User Created date
+          type: string
+          pattern: "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+          maxLength: 31
+          minLength: 31
+          example: 2020-09-14'T'03:14:01.315-03:00
+          readOnly: true
+      required:
+        - nickname
+        - full_name
+        - email
+        - password
+
+    Erros:
+      description: Object with error information.
+      type: object
+      properties:
+        error_messages:
+          description: Object list with information errors.
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                description: Error Code
+                type: string
+                minLength: 10
+                maxLength: 60
+                example: FIELD_IS_MANDATORY
+              message:
+                description: Error message
+                type: string
+                minLength: 10
+                maxLength: 60
+                example: Field name is required
+
+  responses:
+
+    BadRequest:
+      description: The BadRequest error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Erros'
+
+    Unauthorized:
+      description: The Unauthorized error
+
+    Forbidden:
+      description: The Forbidden error
+
+    NotFound:
+      description: The Not Found error
+
+    Unsupported_Media_Type:
+      description: Unsupported Media Type
+
+
+    Internal_Server_Error:
+      description: Internal Server Error
